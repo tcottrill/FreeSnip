@@ -1,5 +1,8 @@
 #include "snip.h"
 #include <wx/mstream.h>
+#ifdef __WXMSW__
+#include <wx/msw/wrapwin.h>
+#endif
 #include <algorithm>
 
 namespace snip {
@@ -15,7 +18,8 @@ wxMemoryBuffer pngBytes(const wxImage& image)
  return bytes;
 }
 
-// Blue rounded square with white crop corners.
+// Blue rounded square with white crop corners. tools/make-icons.py draws the same design
+// for the packaged icons (packaging/icons).
 wxImage appIconImage(int s)
 {
  wxImage image(s, s);
@@ -48,6 +52,12 @@ wxImage appIconImage(int s)
 
 wxIconBundle appIcons()
 {
+#ifdef __WXMSW__
+ // Every size of the exe's "appicon" group (packaging/icons/snip.ico): wx gives the title
+ // bar, taskbar and tray the size for the window's DPI.
+ wxIconBundle resource(wxString("appicon"), static_cast<WXHINSTANCE>(::GetModuleHandleW(nullptr)));
+ if (!resource.IsEmpty()) return resource;
+#endif
  wxIconBundle icons;
  for (int s : { 16, 20, 24, 32, 40, 48, 64, 128, 256 }) {
   wxIcon icon;

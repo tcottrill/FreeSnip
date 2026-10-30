@@ -13,7 +13,7 @@ flatpak build-init "$STAGE" "$ID" org.freedesktop.Sdk org.freedesktop.Platform 2
 install -Dm755 "$OUT/snip" "$STAGE/files/bin/snip"
 install -Dm644 "$PKG/$ID.desktop" "$STAGE/files/share/applications/$ID.desktop"
 install -Dm644 "$PKG/$ID.metainfo.xml" "$STAGE/files/share/metainfo/$ID.metainfo.xml"
-install -Dm644 "$PKG/$ID.svg" "$STAGE/files/share/icons/hicolor/scalable/apps/$ID.svg"
+mkdir -p "$STAGE/files/share/icons" && cp -r "$ROOT/packaging/icons/hicolor" "$STAGE/files/share/icons/"
 install -Dm644 "$ROOT/vendor/wxWidgets/docs/licence.txt" "$STAGE/files/share/licenses/snip/wxWidgets.txt"
 # Screenshots, the global shortcut and Save As go through portals; the tray icon is a
 # StatusNotifierItem, so the watcher is the one other service Snip talks to.

@@ -6,6 +6,15 @@ as Skein Downloader. Linux-specific code is in `src/wx/platform_linux.cpp`.
 
 ## Install on Ubuntu or SteamOS
 
+Two packages (see "Releases" in the README for the release file names):
+
+- **AppImage** (`Snip-x86_64.AppImage`): no installation. Make it executable and run it:
+  `chmod +x Snip-*.AppImage && ./Snip-*.AppImage`. Runs on Ubuntu 22.04 and newer and
+  SteamOS; it uses the desktop's own GTK, so it follows the desktop theme and runs
+  natively on Wayland. Uses `libfuse2` to mount itself; without it run it with
+  `--appimage-extract-and-run`.
+- **Flatpak** (`Snip-x86_64.flatpak`), below.
+
 Copy `dist/linux/Snip-x86_64.flatpak` to your Linux machine. In SteamOS use
 Desktop Mode. Open the file in the software installer, or run:
 
@@ -86,6 +95,18 @@ which is much faster than `/mnt/c`. `tools/package-flatpak.sh` writes
 ```sh
 flatpak install --user flathub org.freedesktop.Sdk//24.08 org.freedesktop.Platform//24.08
 ```
+
+The AppImage:
+
+```powershell
+wsl -d Ubuntu -e bash /mnt/c/Source2026/clip/tools/build-linux-appimage.sh
+```
+
+It builds inside an Ubuntu 22.04 userland started with bubblewrap (no root; needs
+bash, curl and bwrap), links wx statically, leaves GTK to the system, packs with
+linuxdeploy and smoke-tests the result under xvfb. Output:
+`dist/linux/Snip-x86_64.AppImage` and its SHA-256 file. Downloads are pinned by
+checksum and cached in `~/snip-appimage` (`SNIP_APPIMAGE_WORK`).
 
 The Flatpak needs only Wayland/X11, IPC and the GPU, plus talking to
 `org.kde.StatusNotifierWatcher` for the tray icon. Screenshots, the global

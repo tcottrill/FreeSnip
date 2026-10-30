@@ -54,6 +54,27 @@ shows a synthetic snip in the real window (no capture, clipboard untouched).
 
 Linux: see [docs/linux-build.md](docs/linux-build.md).
 
+## Releases
+
+`tools/build-all.ps1` builds everything from this Windows checkout (Linux through
+WSL) and collects it in `dist/release/` with `SHA256SUMS.txt`, named with the
+version in `CMakeLists.txt`:
+
+| File | What it is |
+| --- | --- |
+| `Snip-<version>-windows-x64-setup.exe` | Installer: per user, no administrator rights, Start menu shortcut, optional desktop shortcut and start at sign-in. Closes a running Snip first; uninstall removes it and its sign-in entry. |
+| `Snip-<version>-windows-x64-portable.zip` | `snip.exe` to run from any folder. |
+| `Snip-<version>-linux-x86_64.AppImage` | Runs on Ubuntu 22.04 and newer (and SteamOS) without installing; uses the desktop's own GTK. |
+| `Snip-<version>-linux-x86_64.flatpak` | Flatpak on the freedesktop 24.08 runtime. |
+
+The steps on their own: `tools/build-windows.ps1`, `tools/build-installer.ps1`
+(Inno Setup 6), `tools/build-linux-appimage.sh` and `tools/build-linux.sh` +
+`tools/package-flatpak.sh` (in WSL; see the Linux doc), then
+`tools/collect-release.ps1`. `-SkipLinux` builds only the Windows files.
+
+Icons: `tools/make-icons.py` (Pillow) draws `packaging/icons` (Linux icon theme
+PNGs and `snip.ico`) with the same design as the program's own drawing.
+
 The UI is in `src/wx`. Capture, clipboard, shortcuts, the tray and the single
 instance are platform code: `src/wx/platform_windows.cpp` and
 `src/wx/platform_linux.cpp`.

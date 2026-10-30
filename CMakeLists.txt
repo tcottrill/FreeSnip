@@ -53,8 +53,12 @@ file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/kofi_cup.h"
 if(WIN32)
   add_compile_definitions(UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
   set(rc_version "${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0")
+  # Explorer shows the exe's first icon group; the windows and tray load the same one
+  # (appIcons in src/wx/image.cpp). tools/make-icons.py builds packaging/icons.
+  set(SNIP_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/packaging/icons")
   file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/snip.rc" CONTENT
-"1 VERSIONINFO
+"appicon ICON \"${SNIP_ICONS}/snip.ico\"
+1 VERSIONINFO
 FILEVERSION ${rc_version}
 PRODUCTVERSION ${rc_version}
 BEGIN
@@ -62,7 +66,9 @@ BEGIN
   BEGIN
     BLOCK \"040904B0\"
     BEGIN
+      VALUE \"CompanyName\", \"Tim Cottrill\"
       VALUE \"FileDescription\", \"Snip\"
+      VALUE \"LegalCopyright\", \"Copyright (C) 2026 Tim Cottrill\"
       VALUE \"FileVersion\", \"${PROJECT_VERSION}\"
       VALUE \"InternalName\", \"snip\"
       VALUE \"OriginalFilename\", \"snip.exe\"
@@ -88,6 +94,7 @@ else()
   target_link_libraries(snip PRIVATE wx::core wx::base PkgConfig::GTK3)
   target_compile_options(snip PRIVATE -Wall -Wextra)
   install(TARGETS snip RUNTIME DESTINATION bin)
+  install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/packaging/icons/hicolor" DESTINATION share/icons)
 endif()
 target_compile_definitions(snip PRIVATE SNIP_VERSION="${PROJECT_VERSION}")
 target_include_directories(snip PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")

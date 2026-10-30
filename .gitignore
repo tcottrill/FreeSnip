@@ -2,5 +2,6 @@
 /dist/*.exe
 /dist/debug/
 /dist/linux/snip
+/dist/release/
 /snip.exe
 *.log

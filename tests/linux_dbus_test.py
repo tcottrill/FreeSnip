@@ -10,15 +10,16 @@ hands --snip from a second launch to the running instance, and exits from the me
 Needs a display (Wayland or X11) and PyGObject. See docs/linux-build.md.
 """
 import os
+import struct
 import subprocess
 import sys
 import tempfile
 import time
+import zlib
 
 import gi
 gi.require_version('Gio', '2.0')
-gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import Gio, GLib, GdkPixbuf  # noqa: E402
+from gi.repository import Gio, GLib  # noqa: E402
 
 SNIP = os.path.abspath(sys.argv[1])
 bus = Gio.bus_get_sync(Gio.BusType.SESSION)
@@ -96,8 +97,17 @@ bus.register_object('/StatusNotifierWatcher', watcher_info.interfaces[0], watche
 own('org.freedesktop.portal.Desktop')
 own('org.kde.StatusNotifierWatcher')
 
+def write_png(path, width, height, rgb):
+    def chunk(kind, data):
+        return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data))
+    rows = b''.join(b'\0' + bytes(rgb) * width for _ in range(height))
+    with open(path, 'wb') as f:
+        f.write(b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0))
+                + chunk(b'IDAT', zlib.compress(rows)) + chunk(b'IEND', b''))
+
+
 shot = os.path.join(tempfile.mkdtemp(), 'screen.png')
-GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, 640, 400).savev(shot, 'png', [], [])
+write_png(shot, 640, 400, (37, 99, 235))
 
 snip = subprocess.Popen([SNIP, '--tray'])
 check(pump(lambda: items, 15), 'tray item registered with the watcher')
