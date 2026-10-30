@@ -1,7 +1,8 @@
-# Linux test build
+# Linux build
 
-The Linux version uses Qt 6 Widgets. Windows retains the small native Win32
-executable. The Linux Flatpak uses the same KDE 6.11 runtime as Downloader.
+Snip uses the same wxWidgets code on Linux as on Windows (wxGTK 3, wx 3.3.4
+statically linked). The Flatpak runs on the freedesktop 24.08 runtime, the same
+as Skein Downloader. Linux-specific code is in `src/wx/platform_linux.cpp`.
 
 ## Install on Ubuntu or SteamOS
 
@@ -13,127 +14,106 @@ flatpak install --user ./Snip-x86_64.flatpak
 flatpak run io.github.tcottrill.Snip//preview
 ```
 
-The first installation may download the shared KDE runtime from Flathub.
-If Downloader already uses that runtime, Flatpak reuses it. This is a local
-test candidate, not a published Flathub release. Installing a newer bundle
-with the same command replaces the preview without deleting its settings.
+The first installation may download the freedesktop 24.08 runtime from Flathub
+(Downloader already uses it). This is a local test build, not a Flathub release.
+Installing a newer bundle the same way replaces it.
 
 ## Capture and paste
 
-- Launch Snip, or choose New (Ctrl+N) in its preview window.
-- On Wayland, New requests a desktop snapshot (your desktop may ask permission).
-  Snip covers each screen with its frozen contents. Drag any rectangle and
-  release to copy it immediately. There is no separate windowed cropping step.
-  Enter captures the screen under the pointer; Escape or
-  right-click cancels. Dragging can extend across screen boundaries.
-- On X11, drag directly on the frozen desktop. Enter captures the monitor
-  under the pointer. Escape or right-click cancels.
-- A completed snip automatically goes on the clipboard. Switch to Claude,
-  a browser or another image-aware app and paste with Ctrl+V.
-- Copy (Ctrl+C) copies again; Save As (Ctrl+S) writes a PNG.
-- The Capture menu offers Rectangle, Full desktop, Active window, and Desktop
-  options. Full desktop immediately copies the whole returned screenshot.
-  Active window uses the desktop's direct active-window target where available
-  (Screenshot portal v3 with target 8). Older desktops report this limitation;
-  Desktop options preserves their interactive window/full-screen/area picker.
-  Its returned image is copied immediately without another selection step.
-- Closing the preview hides it when a tray is available; otherwise it exits.
-  Keep Snip running until you have pasted: Linux clipboard contents may be lost
-  when their owning application quits. Quit / Ctrl+Q always exits.
+- Launch Snip from the menu (it starts a snip), or choose New (Ctrl+N) in its window.
+- On Wayland, Snip asks the desktop for a screenshot through the XDG screenshot
+  portal (your desktop may ask permission), then covers each screen with its
+  frozen contents. Drag a rectangle and release to copy it. Enter takes the
+  screen under the pointer; Escape or right-click cancels.
+- On X11 Snip reads the screen itself and shows the same frozen screen.
+- A finished snip is on the clipboard (image/png) at once; paste it with Ctrl+V.
+  Copy (Ctrl+C) copies again; Save As (Ctrl+S) writes a PNG through the desktop's
+  file chooser.
+- Capture offers Rectangle, Full desktop, Active window and Desktop options.
+  Active window needs a desktop whose portal offers it directly; Desktop options
+  opens the desktop's own picker. Their results are copied without a selection step.
+- Window picking with W on the frozen screen is Windows-only (Wayland gives
+  applications no window list).
+- Closing the window hides it when a tray is available; otherwise Snip exits.
+  Keep Snip running until you have pasted: Linux clipboards empty when the
+  owning program quits. Quit (Ctrl+Q) always exits.
 
-On desktops with tray support, click the tray icon for a new snip; right-click
-for New, Show Snip and Exit. Without a tray, the preview remains the control
-window. Launching Snip again tells the running instance to capture.
+The tray icon is a StatusNotifierItem (KDE Plasma and SteamOS show it; GNOME
+needs the AppIndicator extension). Click it for a new snip; its menu has New,
+Capture, Show Snip, Cancel capture and Exit. Launching Snip again tells the
+running copy to snip; `--tray` starts it quietly.
 
-The Shortcut button asks the GlobalShortcuts portal to assign a capture key
-(suggested Ctrl+Alt+S). Availability and the final key are desktop-controlled.
-For a persistent desktop keyboard shortcut, assign this command in your
-desktop's keyboard settings:
+**Shortcut...** asks the desktop's GlobalShortcuts portal for a capture key
+(suggested Ctrl+Alt+S); the desktop decides the final key. Or give this command
+a shortcut in your desktop's keyboard settings:
 
 ```sh
 flatpak run io.github.tcottrill.Snip//preview --snip
 ```
 
-It also launches Snip if it isn't already running. The app does not take over
-Print Screen or modify desktop shortcuts. `--tray` starts without capturing.
+Snip never takes over Print Screen or changes desktop shortcuts.
 
 ## Display and portal behavior
 
-Wayland uses the standard XDG screenshot portal; its permission dialogs and
-supported capture targets depend on the desktop. Install your desktop's portal
-backend if Snip reports that screenshot capture is unavailable. WSLg has a
-Wayland display but does not provide a full Linux desktop screenshot backend.
+Rectangle mode asks the portal for a non-interactive full-desktop screenshot.
+Snip checks that the image matches the monitor layout before covering the
+screens, and that each frozen screen was placed exactly over its monitor before
+it accepts a selection; otherwise it cancels with a message rather than copying
+the wrong pixels. Snips are cut from the screenshot's own pixels, so scaled
+displays keep their full resolution.
 
-Rectangle mode requests noninteractive full-desktop capture. A desktop that
-requires a permission confirmation can still show it before the screen freezes.
-Snip checks that the screenshot dimensions match the desktop layout before
-placing fullscreen overlays. An incompatible screenshot/layout (for example,
-a backend with a different mixed-DPI composition) produces an explicit error
-and leaves Desktop options available, rather than displaying a misaligned image.
-Changing monitors while selecting cancels the capture.
-
-Cropping uses original image pixels. On X11,
-mixed-scale monitors are composed at the highest monitor scale; lower-density
-monitors are resampled. Equal-scale monitor captures preserve pixel density.
-On Wayland, the desktop controls the resolution of the returned screenshot.
+WSLg has a Wayland display but no screenshot portal backend, so capture itself
+cannot be tried there.
 
 ## Build
 
-On Linux with Flatpak Builder and the KDE SDK installed:
-
-```sh
-flatpak install --user flathub org.kde.Sdk//6.11 org.kde.Platform//6.11
-bash tools/build-linux-flatpak.sh
-```
-
-From this Windows checkout:
+The binary is built inside the freedesktop SDK and packaged with
+`flatpak build-init`, as for Downloader. From this Windows checkout:
 
 ```powershell
-wsl -d Ubuntu -- bash /mnt/c/Source2026/clip/tools/build-linux-flatpak.sh
+wsl -d Ubuntu -e bash -c 'cd /mnt/c/Source2026/clip && flatpak run --filesystem=/mnt/c/Source2026/clip --filesystem=home --socket=wayland --env=SNIP_BUILD_DIR=$HOME/snip-build --command=sh org.freedesktop.Sdk//24.08 tools/build-linux.sh'
+wsl -d Ubuntu -e bash /mnt/c/Source2026/clip/tools/package-flatpak.sh
 ```
 
-Build cache and export repository are in `~/snip-flatpak`. Override with
-`SNIP_FLATPAK_WORK`. Output is `dist/linux/Snip-x86_64.flatpak`, alongside
-the SHA-256 file and build log. No application-specific background service,
-network access permission, or broad home-directory permission is needed.
-
-## Automated tests
-
-With native Qt6 development packages, CMake, Ninja and Python:
+`tools/build-linux.sh` writes `dist/linux/snip` and runs the smoke test when a
+display is available. `SNIP_BUILD_DIR` keeps the build tree on the Linux side,
+which is much faster than `/mnt/c`. `tools/package-flatpak.sh` writes
+`dist/linux/Snip-x86_64.flatpak` and its SHA-256 file; its work folder is
+`~/snip-flatpak` (`SNIP_FLATPAK_WORK`). The SDK and runtime come from Flathub:
 
 ```sh
-dbus-run-session -- bash tools/test-linux.sh
+flatpak install --user flathub org.freedesktop.Sdk//24.08 org.freedesktop.Platform//24.08
 ```
 
-Using the installed SDK from WSL:
+The Flatpak needs only Wayland/X11, IPC and the GPU, plus talking to
+`org.kde.StatusNotifierWatcher` for the tray icon. Screenshots, the global
+shortcut and Save As go through portals.
 
-```powershell
-wsl -d Ubuntu -- dbus-run-session -- flatpak run --socket=session-bus --env=QT_QPA_PLATFORM=offscreen --command=bash --filesystem=/mnt/c/Source2026/clip org.kde.Sdk//6.11 /mnt/c/Source2026/clip/tools/test-linux.sh
+## Tests
+
+```sh
+sh tools/test-linux.sh
 ```
 
-Full session-bus access is only used for tests that register fake portal
-services inside an isolated bus; the shipped app uses Flatpak's normal filtered
-bus. The tests cover selection geometry, PNG/clipboard data, mouse/keyboard
-selection, fake screenshot/shortcut portals, PNG saving through the UI,
-capture cancellation and launching a second instance.
+Runs `tests/linux_dbus_test.py` on a private session bus with a fake screenshot
+portal and tray watcher. It checks the tray item and menu, a portal capture
+started from the menu, handing `--snip` from a second launch to the running copy,
+and Exit. Needs `dbus-run-session` and a Wayland display (WSLg works).
 
-Frozen-desktop regressions also cover fullscreen rectangle selection, monitor
-coordinates, pointer-based monitor selection, invalid surface placement, and
-keeping the preview hidden during capture. The Wayland UI integration test uses
-a simulated screenshot portal and checks the exact cropped clipboard pixels.
-
-Packaged startup check (synthetic image, exits automatically):
+Smoke runs (synthetic image, no capture, no clipboard; exit by themselves):
 
 ```sh
 flatpak run io.github.tcottrill.Snip//preview --smoke-test
+dist/linux/snip --smoke-test --overlay --screenshot overlay.png
 ```
 
-## On-device checks for this candidate
+`--overlay` shows a frozen screen with a sample selection instead of the window;
+`--screenshot` saves what the window draws as a PNG, which also works on Wayland.
+
+## Checks that need a real desktop
 
 - KDE/SteamOS and GNOME/Ubuntu: capture, cancel, then capture again.
-- Paste a cropped snip into Claude/browser and an image editor.
-- Save to Pictures and a folder chosen through the desktop file chooser.
-- Try multiple monitors, different scaling, and monitors left of the primary.
-- Test the tray, desktop shortcut and portal Shortcut button.
-
-Automated tests and WSL startup cannot establish those real-desktop results.
+- Paste a snip into Claude or a browser and into an image editor.
+- Save to Pictures and to a folder chosen in the file chooser.
+- Several monitors, different scaling, monitors left of the primary.
+- The tray icon and menu, a desktop shortcut and the Shortcut button.

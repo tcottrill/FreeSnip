@@ -1,6 +1,8 @@
 // Windows: GDI desktop capture, PNG + DIB clipboard, global shortcuts on a hidden
-// message window (also the single-instance target), and the HKCU Run entry.
+// message window (also the single-instance target), the tray icon and the HKCU
+// Run entry.
 #include "snip.h"
+#include <wx/taskbar.h>
 #include <wx/msw/wrapwin.h>
 #include "../monitor_select.h"
 #include <dwmapi.h>
@@ -184,6 +186,7 @@ void stopShortcuts()
 
 wxString shortcutNames() { return g_names; }
 
+namespace {
 bool grabDesktop(DesktopShot& shot, wxString& error)
 {
  const int vx = GetSystemMetrics(SM_XVIRTUALSCREEN), vy = GetSystemMetrics(SM_YVIRTUALSCREEN);
@@ -227,6 +230,74 @@ bool grabDesktop(DesktopShot& shot, wxString& error)
  WindowScan scan{ &shot.windows, RECT{ vx, vy, vx + vw, vy + vh }, GetCurrentProcessId() };
  EnumWindows(CollectWindow, reinterpret_cast<LPARAM>(&scan));
  return true;
+}
+}
+
+void capture(CaptureMode, std::function<void(DesktopShot shot, wxString error)> done)
+{
+ DesktopShot shot;
+ wxString error;
+ if (!grabDesktop(shot, error)) shot = DesktopShot{};
+ done(std::move(shot), error);
+}
+
+void cancelCapture() {}
+
+bool canSetupShortcut() { return false; }
+void setupShortcut(std::function<void(const wxString&)>) {}
+
+namespace {
+class Tray : public wxTaskBarIcon {
+public:
+ explicit Tray(TrayActions actions) : actions_(std::move(actions))
+ {
+  Bind(wxEVT_TASKBAR_LEFT_UP, [this](wxTaskBarIconEvent&) { if (actions_.click) actions_.click(); });
+  Bind(wxEVT_MENU, [this](wxCommandEvent& e) { if (actions_.chosen) actions_.chosen(e.GetId()); });
+ }
+protected:
+ wxMenu* CreatePopupMenu() override
+ {
+  auto menu = new wxMenu;
+  if (actions_.menu) fill(menu, actions_.menu());
+  return menu;
+ }
+private:
+ TrayActions actions_;
+ static void fill(wxMenu* menu, const std::vector<TrayItem>& items)
+ {
+  for (const auto& item : items) {
+   if (item.label.empty()) menu->AppendSeparator();
+   else if (!item.submenu.empty()) {
+    auto sub = new wxMenu;
+    fill(sub, item.submenu);
+    menu->AppendSubMenu(sub, item.label);
+   } else if (item.checkable) menu->AppendCheckItem(item.id, item.label)->Check(item.checked);
+   else menu->Append(item.id, item.label);
+  }
+ }
+};
+Tray* g_tray = nullptr;
+}
+
+bool startTray(TrayActions actions, const wxString& tooltip)
+{
+ g_tray = new Tray(std::move(actions));
+ if (g_tray->SetIcon(wxBitmapBundle::FromIconBundle(appIcons()), tooltip)) return true;
+ stopTray();
+ return false;
+}
+
+void stopTray()
+{
+ if (!g_tray) return;
+ g_tray->RemoveIcon();
+ g_tray->Destroy();
+ g_tray = nullptr;
+}
+
+void placeSurface(wxTopLevelWindow* window, const Output& output)
+{
+ if (window->GetRect() != output.geometry) window->SetSize(output.geometry);
 }
 
 // Puts both a "PNG" clipboard format (browsers / Electron apps prefer it) and a

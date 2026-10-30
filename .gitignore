@@ -1,5 +1,6 @@
 /build/
 /dist/*.exe
 /dist/debug/
+/dist/linux/snip
 /snip.exe
 *.log

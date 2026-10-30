@@ -1,16 +1,15 @@
 # snip
 
-**Linux:** a Qt 6 version and Flatpak test package are now available. See
-[Linux install/build instructions](docs/linux-build.md). The details below
-describe the original Windows version.
+A small screen snipping tool for Windows and Linux, one wxWidgets program on
+both. Windows: one ~4.5 MB exe (wx statically linked), no installer, no
+services, no Store app, no runtime dependencies. Linux: a Flatpak; see
+[Linux install/build instructions](docs/linux-build.md).
 
-A small screen snipping tool: one ~4.5 MB exe (wxWidgets, statically linked),
-no installer, no services, no Store app, no runtime dependencies.
+## Use (Windows)
 
-## Use
-
-Run `snip.exe`. It opens the capture GUI with **New** and **Window** controls.
-Running it again restores that window. Closing the window keeps Snip in the tray.
+Run `snip.exe`. It opens the Snip window: **New**, **Capture ▾** (Rectangle,
+Window, Full desktop), **Copy**, **Save As...**, **Quit**. Running it again
+restores that window. Closing the window keeps Snip in the tray.
 
 * **Start a snip:** **Win+Shift+S**, click **New**, click the tray icon,
   or run `snip.exe /snip` for immediate capture. `/tray` starts quietly in the tray.
@@ -22,17 +21,17 @@ Running it again restores that window. Closing the window keeps Snip in the tray
   drag. Enter = whole monitor under the cursor. Esc or right-click = cancel.
 * **Capture a window:** press **W** on the frozen screen, hover to highlight an
   application window, then click to copy it. Press **R** to return to rectangle
-  selection. You can also use **Window** in the preview (Ctrl+Shift+W) or
-  **Capture window** in the tray menu. The capture includes the title bar and
+  selection. You can also use **Capture ▾ > Window** (Ctrl+Shift+W) or
+  **Capture > Window** in the tray menu. The capture includes the title bar and
   visible window area, excluding invisible resize borders. It captures what is
   on screen: overlapping windows remain visible and off-screen portions are
   clipped. Bring the desired window to the front first for an unobstructed snip.
 * **After the snip:** the snip is already on the clipboard (PNG and bitmap), so
-  you can paste it straight into Claude, a browser, Office or Paint. The preview
-  window has **New** (Ctrl+N), **Copy** (Ctrl+C), **Save As...** (Ctrl+S, PNG)
-  and Esc to close.
-* **Tray right-click:** New snip, Capture window, Open Snip, Start with Windows (an HKCU
-  Run entry with `/tray`), Exit.
+  you can paste it straight into Claude, a browser, Office or Paint. The window
+  has **New** (Ctrl+N), **Copy** (Ctrl+C), **Save As...** (Ctrl+S, PNG),
+  **Quit** (Ctrl+Q) and Esc to close.
+* **Tray right-click:** New snip, Capture (Rectangle / Window / Full desktop),
+  Show Snip, Start with Windows (an HKCU Run entry with `/tray`), Exit.
 
 Spans all monitors, DPI-aware per monitor (snips are in real pixels).
 
@@ -42,14 +41,17 @@ then restart snip.
 
 ## Build
 
-`build.bat` or `tools/build-windows.ps1` (Visual Studio 2022, x64, Ninja,
-static CRT). Output: `dist/snip.exe`. The build runs a smoke test that shows a
-synthetic snip in the real window (no capture, clipboard untouched).
-
 wxWidgets 3.3.4 is a git submodule in `vendor/wxWidgets`; after cloning run
-`git submodule update --init --recursive`. The UI is in `src/wx`, with the
-Windows capture, clipboard, hotkeys and tray start-up in
-`src/wx/platform_windows.cpp`. Linux still builds the Qt version in `src/qt`
-until it is moved to wx too.
+`git submodule update --init --recursive`.
+
+Windows: `build.bat` or `tools/build-windows.ps1` (Visual Studio 2022, x64,
+Ninja, static CRT). Output: `dist/snip.exe`. The build runs a smoke test that
+shows a synthetic snip in the real window (no capture, clipboard untouched).
+
+Linux: see [docs/linux-build.md](docs/linux-build.md).
+
+The UI is in `src/wx`. Capture, clipboard, shortcuts, the tray and the single
+instance are platform code: `src/wx/platform_windows.cpp` and
+`src/wx/platform_linux.cpp`.
 
 `src/monitor_select.*` is a vendored copy of `C:\Source2026\shared\monitor_select`.

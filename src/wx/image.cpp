@@ -15,9 +15,8 @@ wxMemoryBuffer pngBytes(const wxImage& image)
  return bytes;
 }
 
-namespace {
 // Blue rounded square with white crop corners.
-wxImage iconImage(int s)
+wxImage appIconImage(int s)
 {
  wxImage image(s, s);
  image.InitAlpha();
@@ -43,14 +42,13 @@ wxImage iconImage(int s)
  fill(hi - len, hi - t, len, t); fill(hi - t, hi - len, t, len);
  return image;
 }
-}
 
 wxIconBundle appIcons()
 {
  wxIconBundle icons;
  for (int s : { 16, 20, 24, 32, 40, 48, 64, 128, 256 }) {
   wxIcon icon;
-  icon.CopyFromBitmap(wxBitmap(iconImage(s)));
+  icon.CopyFromBitmap(wxBitmap(appIconImage(s)));
   icons.AddIcon(icon);
  }
  return icons;
