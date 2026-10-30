@@ -4,6 +4,7 @@
 //   --tray  start quietly in the tray ("Start with Windows" uses it)
 //   --smoke-test  show a synthetic snip without capturing or touching the clipboard, then exit
 //     --overlay          show a synthetic frozen screen with a selection instead
+//     --about            open the About box over it
 //     --screenshot PATH  save what the window draws as a PNG before exiting
 #include "snip.h"
 #include <wx/config.h>
@@ -135,7 +136,7 @@ class Application : public wxApp {
 public:
  bool OnInit() override
  {
-  bool tray = false, snipNow = false, smoke = false, overlay = false;
+  bool tray = false, snipNow = false, smoke = false, overlay = false, about = false;
   wxString screenshot;
   for (int i = 1; i < argc; ++i) {
    const wxString a = wxString(argv[i]).Lower();
@@ -143,6 +144,7 @@ public:
    if (a == "/snip" || a == "-snip" || a == "--snip") snipNow = true;
    if (a == "--smoke-test") smoke = true;
    if (a == "--overlay") overlay = true;
+   if (a == "--about") about = true;
    if (a == "--screenshot" && i + 1 < argc) screenshot = argv[++i];
   }
 #ifdef __WXGTK__
@@ -158,7 +160,7 @@ public:
 
   SetAppName("Snip");
   SetVendorName("tcottrill");
-  SetAppearance(Appearance::System);   // before the first window
+  SetAppearance(snip::savedAppearance());   // before the first window (Windows applies it only then)
   wxImage::AddHandler(new wxPNGHandler);
   g_main = new snip::MainWindow;
   SetTopWindow(g_main);
@@ -178,8 +180,14 @@ public:
     image.SetRGB(wxRect(0, 0, 301, 151), 0x25, 0x63, 0xEB);
     g_main->showImage(image, wxDefaultPosition, false);
    }
+   if (about) g_main->CallAfter([] { if (g_main) snip::showAbout(g_main); });
    smokeTimer_.Bind(wxEVT_TIMER, [this, shown, screenshot](wxTimerEvent&) {
-    if (!screenshot.empty()) saveWindow(shown, screenshot);
+    wxTopLevelWindow* target = shown;
+    wxDialog* dialog = nullptr;
+    for (auto* w : wxTopLevelWindows)
+     if (auto* d = wxDynamicCast(w, wxDialog); d && d->IsShown()) target = dialog = d;
+    if (!screenshot.empty()) saveWindow(target, screenshot);
+    if (dialog) dialog->EndModal(wxID_OK);
     smokeOverlay_.reset();
     snip::quitApp();
    });

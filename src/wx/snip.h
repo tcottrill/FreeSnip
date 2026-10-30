@@ -44,6 +44,12 @@ wxImage appIconImage(int size);
 wxIconBundle appIcons();
 void quitApp();
 
+// about.cpp: the About box (with the Light / Dark / system theme choice), the saved
+// theme, and Downloader's drawn "Support me on Ko-fi" button.
+void showAbout(wxWindow* parent);
+wxApp::Appearance savedAppearance();
+wxWindow* makeKofiButton(wxWindow* parent);
+
 namespace platform {
 // True when Snip is already running; the command ("snip", "show" or "tray") went to it.
 bool otherInstance(const wxString& command);

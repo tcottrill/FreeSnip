@@ -34,7 +34,10 @@ wxImage appIconImage(int s)
   for (int y = std::max(y0, 0); y < std::min(y0 + h, s); ++y)
    for (int x = std::max(x0, 0); x < std::min(x0 + w, s); ++x) image.SetRGB(x, y, 255, 255, 255);
  };
- const int in = s * 22 / 100, len = std::max(2, s * 28 / 100), t = std::max(1, s / 10);
+ // Large sizes use the proportions of packaging/flatpak/io.github.tcottrill.Snip.svg;
+ // small ones need longer, thicker marks to stay readable.
+ const bool large = s >= 48;
+ const int in = s * 22 / 100, len = std::max(2, s * (large ? 19 : 28) / 100), t = std::max(1, large ? s * 8 / 100 : s / 10);
  const int lo = in, hi = s - in;
  fill(lo, lo, len, t);           fill(lo, lo, t, len);
  fill(hi - len, lo, len, t);     fill(hi - t, lo, t, len);

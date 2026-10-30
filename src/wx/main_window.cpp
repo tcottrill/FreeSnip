@@ -24,7 +24,7 @@ MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Snip")
  auto bar = new wxBoxSizer(wxHORIZONTAL);
  auto add = [&](const wxString& label, int id) {
   auto b = new wxButton(panel, id, label);
-  bar->Add(b, 0, bar->GetItemCount() ? wxLEFT : 0, FromDIP(6));
+  bar->Add(b, 0, (bar->GetItemCount() ? wxLEFT : 0) | wxALIGN_CENTER_VERTICAL, FromDIP(6));
   return b;
  };
  new_ = add("New", ID_NEW);
@@ -40,9 +40,13 @@ MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Snip")
 #endif
  if (platform::canSetupShortcut()) add("Shortcut...", ID_SHORTCUT);
  add("Quit", wxID_EXIT);
+ // The Ko-fi badge and About sit apart from the snip actions, at the far right (as in Downloader).
+ bar->AddStretchSpacer();
+ bar->Add(makeKofiButton(panel), 0, wxLEFT | wxALIGN_CENTER_VERTICAL, FromDIP(12));
+ add("About", wxID_ABOUT);
  copy_->Disable();
  save_->Disable();
- column->Add(bar, 0, wxALL, FromDIP(6));
+ column->Add(bar, 0, wxALL | wxEXPAND, FromDIP(6));
  preview_ = new wxWindow(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE | wxFULL_REPAINT_ON_RESIZE);
  preview_->SetBackgroundStyle(wxBG_STYLE_PAINT);
  preview_->Bind(wxEVT_PAINT, [this](wxPaintEvent&) { paintPreview(); });
@@ -70,6 +74,7 @@ MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Snip")
  on(ID_SHORTCUT, [this] { platform::setupShortcut([this](const wxString& text) { SetStatusText(text); }); });
  on(ID_CLOSE, [this] { Close(); });
  on(wxID_EXIT, [] { quitApp(); });
+ on(wxID_ABOUT, [this] { showAbout(this); });
  capture_->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { captureMenu(); });
 
  wxAcceleratorEntry keys[] = {

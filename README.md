@@ -8,8 +8,12 @@ services, no Store app, no runtime dependencies. Linux: a Flatpak; see
 ## Use (Windows)
 
 Run `snip.exe`. It opens the Snip window: **New**, **Capture ▾** (Rectangle,
-Window, Full desktop), **Copy**, **Save As...**, **Quit**. Running it again
-restores that window. Closing the window keeps Snip in the tray.
+Window, Full desktop), **Copy**, **Save As...**, **Quit**, and at the right
+**Support me on Ko-fi** and **About**. Running it again restores that window.
+Closing the window keeps Snip in the tray.
+
+**About** shows the version and a **Theme** choice: Same as system, Light or
+Dark. On Windows the new theme applies the next time Snip starts; on Linux at once.
 
 * **Start a snip:** **Win+Shift+S**, click **New**, click the tray icon,
   or run `snip.exe /snip` for immediate capture. `/tray` starts quietly in the tray.

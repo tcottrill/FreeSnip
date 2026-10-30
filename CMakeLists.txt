@@ -41,7 +41,15 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/wxWidgets/CMakeLists.txt")
 endif()
 add_subdirectory(vendor/wxWidgets EXCLUDE_FROM_ALL)
 
-set(sources src/wx/app.cpp src/wx/main_window.cpp src/wx/frozen_desktop.cpp src/wx/image.cpp)
+set(sources src/wx/app.cpp src/wx/main_window.cpp src/wx/frozen_desktop.cpp src/wx/image.cpp src/wx/about.cpp)
+# The Ko-fi cup logo for the Ko-fi button, compiled in (copied from Skein Downloader's
+# src/wx/res/kofi-cup.png). The rest of the button is drawn.
+set(png "${CMAKE_CURRENT_SOURCE_DIR}/src/wx/res/kofi-cup.png")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${png}")
+file(READ "${png}" hex HEX)
+string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," hex "${hex}")
+file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/kofi_cup.h"
+  CONTENT "// Generated from src/wx/res/kofi-cup.png by CMakeLists.txt.\nstatic const unsigned char kofiCup[] = {${hex}};\n")
 if(WIN32)
   add_compile_definitions(UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
   set(rc_version "${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0")
@@ -81,6 +89,8 @@ else()
   target_compile_options(snip PRIVATE -Wall -Wextra)
   install(TARGETS snip RUNTIME DESTINATION bin)
 endif()
+target_compile_definitions(snip PRIVATE SNIP_VERSION="${PROJECT_VERSION}")
+target_include_directories(snip PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 # Packaging builds with a read-only source tree set their own folder.
 set(SNIP_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dist" CACHE PATH "Folder for the built executable")
 set_target_properties(snip PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SNIP_OUTPUT_DIR}$<$<CONFIG:Debug>:/debug>")

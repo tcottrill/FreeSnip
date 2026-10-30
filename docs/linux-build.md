@@ -38,6 +38,8 @@ Installing a newer bundle the same way replaces it.
   Keep Snip running until you have pasted: Linux clipboards empty when the
   owning program quits. Quit (Ctrl+Q) always exits.
 
+**About** has a Theme choice (Same as system, Light, Dark) that applies at once.
+
 The tray icon is a StatusNotifierItem (KDE Plasma and SteamOS show it; GNOME
 needs the AppIndicator extension). Click it for a new snip; its menu has New,
 Capture, Show Snip, Cancel capture and Exit. Launching Snip again tells the
@@ -107,7 +109,8 @@ flatpak run io.github.tcottrill.Snip//preview --smoke-test
 dist/linux/snip --smoke-test --overlay --screenshot overlay.png
 ```
 
-`--overlay` shows a frozen screen with a sample selection instead of the window;
+`--overlay` shows a frozen screen with a sample selection instead of the window,
+`--about` opens the About box over the window;
 `--screenshot` saves what the window draws as a PNG, which also works on Wayland.
 
 ## Checks that need a real desktop
