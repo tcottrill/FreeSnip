@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+ <id>io.github.tcottrill.Snip</id>
+ <name>Snip</name>
+ <summary>Capture, crop, copy and save screenshots</summary>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>LicenseRef-proprietary</project_license>
+ <description><p>A small screen capture tool with rectangular cropping, clipboard copying and PNG saving.</p></description>
+ <launchable type="desktop-id">io.github.tcottrill.Snip.desktop</launchable>
+ <content_rating type="oars-1.1"/>
+ <releases><release version="1.1.0" date="2026-10-21"/></releases>
+</component>

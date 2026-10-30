@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Snip
+Comment=Capture a rectangle, copy it, or save a PNG
+Exec=snip --snip
+Icon=io.github.tcottrill.Snip
+Terminal=false
+Categories=Utility;Graphics;
+Keywords=screenshot;screen;capture;snipping;
+StartupNotify=true
+Actions=NewSnip;
+
+[Desktop Action NewSnip]
+Name=New snip
+Exec=snip --snip

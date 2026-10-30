@@ -1,0 +1,31 @@
+{
+  "app-id": "io.github.tcottrill.Snip",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "6.11",
+  "sdk": "org.kde.Sdk",
+  "command": "snip",
+  "finish-args": [
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--share=ipc",
+    "--device=dri",
+    "--env=QT_QPA_PLATFORM=wayland;xcb"
+  ],
+  "modules": [{
+    "name": "snip",
+    "buildsystem": "cmake-ninja",
+    "config-opts": ["-DCMAKE_BUILD_TYPE=Release", "-DBUILD_TESTING=OFF"],
+    "sources": [
+      {"type":"dir", "path":"../../src", "dest":"src"},
+      {"type":"file", "path":"../../CMakeLists.txt"},
+      {"type":"file", "path":"io.github.tcottrill.Snip.desktop"},
+      {"type":"file", "path":"io.github.tcottrill.Snip.svg"},
+      {"type":"file", "path":"io.github.tcottrill.Snip.metainfo.xml"}
+    ],
+    "post-install": [
+      "install -Dm644 io.github.tcottrill.Snip.desktop /app/share/applications/io.github.tcottrill.Snip.desktop",
+      "install -Dm644 io.github.tcottrill.Snip.svg /app/share/icons/hicolor/scalable/apps/io.github.tcottrill.Snip.svg",
+      "install -Dm644 io.github.tcottrill.Snip.metainfo.xml /app/share/metainfo/io.github.tcottrill.Snip.metainfo.xml"
+    ]
+  }]
+}
