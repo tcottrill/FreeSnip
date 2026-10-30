@@ -1,3 +1,5 @@
 /build/
-/vendor/wxWidgets/
+/dist/*.exe
+/dist/debug/
+/snip.exe
 *.log

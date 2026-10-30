@@ -1,18 +1,69 @@
 cmake_minimum_required(VERSION 3.24)
-project(Snip VERSION 1.1.0 LANGUAGES CXX)
+project(Snip VERSION 1.2.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(WIN32)
+  # wxWidgets (static, static CRT), set up like C:\Source2026\Downloader-lite.
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-  add_executable(snip WIN32 src/main.cpp src/monitor_select.cpp)
-  target_compile_definitions(snip PRIVATE UNICODE _UNICODE)
-  target_compile_options(snip PRIVATE /W4 /utf-8 /EHsc)
+  set(wxBUILD_SHARED OFF CACHE BOOL "" FORCE)
+  set(wxBUILD_USE_STATIC_RUNTIME ON CACHE BOOL "" FORCE)
+  set(wxBUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+  set(wxBUILD_TESTS OFF CACHE BOOL "" FORCE)
+  set(wxBUILD_DEMOS OFF CACHE BOOL "" FORCE)
+  set(wxBUILD_LOCALES OFF CACHE BOOL "" FORCE)
+  set(wxBUILD_INSTALL OFF CACHE BOOL "" FORCE)
+  foreach(feature LIBJPEG LIBTIFF LIBWEBP NANOSVG EXPAT REGEX)
+    set(wxUSE_${feature} OFF CACHE STRING "" FORCE)
+  endforeach()
+  # PNG for the clipboard and Save As; wx's own copies of libpng and zlib.
+  foreach(feature LIBPNG ZLIB)
+    set(wxUSE_${feature} builtin CACHE STRING "" FORCE)
+  endforeach()
+  foreach(feature WEBVIEW WEBVIEW_EDGE WEBVIEW_IE WEBREQUEST MEDIACTRL HTML XML XRC RICHTEXT STC AUI RIBBON PROPGRID GL SVG ARCHIVE_STREAMS ZIPSTREAM TARSTREAM JOYSTICK SOCKETS PROTOCOL URL PROTOCOL_FTP PROTOCOL_HTTP PROTOCOL_FILE FS_INET FS_ARCHIVE FS_ZIP SECRETSTORE LIBLZMA GIF PCX TGA IFF PNM ARTPROVIDER_TANGO IPC HELP WXHTML_HELP MS_HTML_HELP DETECT_SM UIACTIONSIMULATOR XTEST)
+    set(wxUSE_${feature} OFF CACHE BOOL "" FORCE)
+  endforeach()
+  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/wxWidgets/CMakeLists.txt")
+    message(FATAL_ERROR "wxWidgets is missing from vendor/wxWidgets. It is a git submodule: run\n"
+      "  git submodule update --init --recursive\nor clone with --recursive.")
+  endif()
+  add_subdirectory(vendor/wxWidgets EXCLUDE_FROM_ALL)
+  add_compile_definitions(UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
+  set(rc_version "${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0")
+  file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/snip.rc" CONTENT
+"1 VERSIONINFO
+FILEVERSION ${rc_version}
+PRODUCTVERSION ${rc_version}
+BEGIN
+  BLOCK \"StringFileInfo\"
+  BEGIN
+    BLOCK \"040904B0\"
+    BEGIN
+      VALUE \"FileDescription\", \"Snip\"
+      VALUE \"FileVersion\", \"${PROJECT_VERSION}\"
+      VALUE \"InternalName\", \"snip\"
+      VALUE \"OriginalFilename\", \"snip.exe\"
+      VALUE \"ProductName\", \"Snip\"
+      VALUE \"ProductVersion\", \"${PROJECT_VERSION}\"
+    END
+  END
+  BLOCK \"VarFileInfo\"
+  BEGIN
+    VALUE \"Translation\", 0x409, 1200
+  END
+END
+")
+  add_executable(snip WIN32 src/wx/app.cpp src/wx/main_window.cpp src/wx/frozen_desktop.cpp src/wx/image.cpp
+    src/wx/platform_windows.cpp src/monitor_select.cpp "${CMAKE_CURRENT_BINARY_DIR}/snip.rc")
+  target_link_libraries(snip PRIVATE wx::core wx::base dwmapi)
+  target_compile_options(snip PRIVATE /W4 /utf-8)
+  target_link_options(snip PRIVATE /MANIFEST:EMBED "/MANIFESTINPUT:${CMAKE_CURRENT_SOURCE_DIR}/app.manifest")
+  set(SNIP_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dist" CACHE PATH "Folder for the built executable")
+  set_target_properties(snip PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${SNIP_OUTPUT_DIR}$<$<CONFIG:Debug>:/debug>")
+  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT snip)
   include(CTest)
   if(BUILD_TESTING)
-    add_executable(windows_capture_tests tests/windows_capture_tests.cpp src/monitor_select.cpp)
-    target_compile_definitions(windows_capture_tests PRIVATE UNICODE _UNICODE)
-    target_compile_options(windows_capture_tests PRIVATE /W4 /utf-8 /EHsc)
-    add_test(NAME windows_capture_tests COMMAND windows_capture_tests)
+    # Shows a synthetic snip in the real window and exits; no capture, no clipboard.
+    add_test(NAME smoke_test COMMAND snip --smoke-test)
   endif()
   return()
 endif()

@@ -4,8 +4,8 @@
 [Linux install/build instructions](docs/linux-build.md). The details below
 describe the original Windows version.
 
-A tiny screen snipping tool: one ~200 KB exe, no installer, no services, no
-Store app, no runtime dependencies.
+A small screen snipping tool: one ~4.5 MB exe (wxWidgets, statically linked),
+no installer, no services, no Store app, no runtime dependencies.
 
 ## Use
 
@@ -42,15 +42,14 @@ then restart snip.
 
 ## Build
 
-`build.bat` (Visual Studio 2022, x64, static CRT). Output: `snip.exe`.
+`build.bat` or `tools/build-windows.ps1` (Visual Studio 2022, x64, Ninja,
+static CRT). Output: `dist/snip.exe`. The build runs a smoke test that shows a
+synthetic snip in the real window (no capture, clipboard untouched).
 
-Native Windows capture regression tests (run on an interactive desktop; they
-briefly display test windows and replace the clipboard with a test capture):
-
-```powershell
-cmake -S . -B build/windows-check
-cmake --build build/windows-check --config Release
-ctest --test-dir build/windows-check -C Release --output-on-failure
-```
+wxWidgets 3.3.4 is a git submodule in `vendor/wxWidgets`; after cloning run
+`git submodule update --init --recursive`. The UI is in `src/wx`, with the
+Windows capture, clipboard, hotkeys and tray start-up in
+`src/wx/platform_windows.cpp`. Linux still builds the Qt version in `src/qt`
+until it is moved to wx too.
 
 `src/monitor_select.*` is a vendored copy of `C:\Source2026\shared\monitor_select`.
