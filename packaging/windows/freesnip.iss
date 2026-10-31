@@ -80,6 +80,13 @@ Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; \
   Flags: runhidden; RunOnceId: "StopFreeSnip"
 
 [Code]
+// Inno Setup 6.7 leaves too little room left of the task check boxes above 100% DPI,
+// so their left edge is cut off; this margin shows them whole.
+procedure InitializeWizard;
+begin
+  WizardForm.TasksList.Offset := ScaleX(4);
+end;
+
 // A running Snip from before the rename holds snip.exe, which [InstallDelete] removes, and
 // the single-instance lock: stop this installation's copy before installing.
 function PrepareToInstall(var NeedsRestart: Boolean): String;
