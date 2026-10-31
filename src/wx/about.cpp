@@ -161,7 +161,8 @@ void showAbout(wxWindow* parent)
  info.SetDescription("Grab it. Clip it. Done.\n\n"
                      "A small screen snipping tool: drag a rectangle on the frozen screen,\n"
                      "then paste it anywhere or save it as a PNG.");
- info.SetCopyright(wxString::FromUTF8("Copyright \xC2\xA9 2026 Tim Cottrill"));
+ info.SetCopyright(wxString::FromUTF8("Copyright \xC2\xA9 2026 Tim Cottrill\n"
+                                      "Licensed under GPL-3.0-or-later"));
  wxIcon icon;
  icon.CopyFromBitmap(wxBitmap(appIconImage(parent->FromDIP(64))));
  info.SetIcon(icon);

@@ -101,6 +101,7 @@ inroot '
   DESTDIR=/build/AppDir cmake --install /build/app
   mkdir -p /build/tools
   LICENSES=/build/AppDir/usr/share/licenses/freesnip; mkdir -p "$LICENSES"
+  install -m644 /src/LICENSE "$LICENSES/LICENSE"
   install -m644 /src/vendor/wxWidgets/docs/licence.txt "$LICENSES/wxWidgets.txt"
   install -Dm644 /src/packaging/flatpak/'"$ID"'.metainfo.xml /build/AppDir/usr/share/metainfo/'"$ID"'.appdata.xml
 

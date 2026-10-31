@@ -55,6 +55,7 @@ Type: files; Name: "{autodesktop}\Snip.lnk"
 [Files]
 Source: "{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#Root}\README.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#Root}\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 Source: "{#Root}\vendor\wxWidgets\docs\licence.txt"; DestDir: "{app}"; DestName: "wxWidgets-licence.txt"; Flags: ignoreversion
 
 [Icons]

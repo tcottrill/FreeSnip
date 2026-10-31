@@ -20,6 +20,7 @@ if (Test-Path -LiteralPath $exe) {
     $stage = Join-Path $out "FreeSnip-$version-windows-x64-portable"
     New-Item -ItemType Directory $stage | Out-Null
     Copy-Item -LiteralPath $exe, (Join-Path $repo 'README.md') -Destination $stage
+    Copy-Item -LiteralPath (Join-Path $repo 'LICENSE') -Destination (Join-Path $stage 'LICENSE.txt')
     Copy-Item -LiteralPath (Join-Path $repo 'vendor/wxWidgets/docs/licence.txt') -Destination (Join-Path $stage 'wxWidgets-licence.txt')
     Compress-Archive -Path (Join-Path $stage '*') -DestinationPath "$stage.zip"
     Remove-Item -LiteralPath $stage -Recurse -Force

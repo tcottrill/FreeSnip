@@ -4,7 +4,7 @@
  <name>FreeSnip</name>
  <summary>Grab it. Clip it. Done.</summary>
  <metadata_license>CC0-1.0</metadata_license>
- <project_license>LicenseRef-proprietary</project_license>
+ <project_license>GPL-3.0-or-later</project_license>
  <description><p>A small screen capture tool with rectangular cropping, clipboard copying and PNG saving.</p></description>
  <launchable type="desktop-id">io.github.tcottrill.FreeSnip.desktop</launchable>
  <content_rating type="oars-1.1"/>

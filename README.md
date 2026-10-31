@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="packaging/icons/freesnip.png" alt="FreeSnip scissors and screen capture icon" width="200">
+  <img src="images/freesnip-brand/freesnip-banner.png" alt="FreeSnip — Grab it. Clip it. Done. Screen capture for Windows and Linux." width="100%">
 </p>
 
 # FreeSnip
@@ -198,3 +198,17 @@ instance are platform code: `src/wx/platform_windows.cpp` and
 `src/monitor_select.*` is a vendored copy of `C:\Source2026\shared\monitor_select`.
 
 </details>
+
+## License
+
+Copyright (C) 2026 Tim Cottrill
+
+This program is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See [LICENSE](LICENSE) for the full text.
+
+wxWidgets keeps its own license (wxWindows Library Licence,
+`vendor/wxWidgets/docs/licence.txt`).
