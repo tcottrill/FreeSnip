@@ -12,7 +12,7 @@ editor. Save a PNG when you need a file.
 
 Choose a Windows installer or portable ZIP, a Linux AppImage, or a Flatpak with
 SteamOS support. The Windows app runs as a single executable with no services,
-Store app, or extra runtime dependencies.
+Store app, or extra runtime dependencies unlike the current Windows 11 snipping tool.
 
 **[Downloads](#downloads) · [Screenshots](#screenshots) · [Quick start](#quick-start) · [Keyboard shortcuts](#keyboard-shortcuts) · [Building from source](#building-from-source)**
 
