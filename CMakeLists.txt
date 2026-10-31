@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.24)
 project(FreeSnip VERSION 1.2.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Visual Studio solutions (tools/make-vs2022.ps1): wx's projects go in solution folders.
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # wxWidgets, static, set up like C:\Source2026\Downloader-lite: wxMSW on Windows
 # (static CRT, no DLLs), wxGTK 3 on Linux.
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -93,6 +95,7 @@ END
   target_compile_options(freesnip PRIVATE /W4 /utf-8)
   target_link_options(freesnip PRIVATE /MANIFEST:EMBED "/MANIFESTINPUT:${CMAKE_CURRENT_SOURCE_DIR}/app.manifest")
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT freesnip)
+  set_target_properties(freesnip PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 else()
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(GTK3 REQUIRED IMPORTED_TARGET gtk+-3.0)
