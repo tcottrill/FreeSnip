@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=FreeSnip
+Comment=Grab it. Clip it. Done.
+Exec=freesnip --snip
+Icon=io.github.tcottrill.FreeSnip
+Terminal=false
+Categories=Utility;Graphics;
+Keywords=screenshot;screen;capture;snipping;snip;
+StartupNotify=true
+Actions=NewSnip;
+
+[Desktop Action NewSnip]
+Name=New snip
+Exec=freesnip --snip

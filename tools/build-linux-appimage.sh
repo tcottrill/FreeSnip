@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds dist/linux/Snip-x86_64.AppImage, the Linux release for systems without Flatpak.
+# Builds dist/linux/FreeSnip-x86_64.AppImage, the Linux release for systems without Flatpak.
 #
 # The build runs inside an Ubuntu 22.04 userland (glibc 2.35, GTK 3.24) started with
 # bubblewrap, so the AppImage runs on Ubuntu 22.04 and newer even when this machine is
@@ -18,8 +18,8 @@ WORK="${SNIP_APPIMAGE_WORK:-$HOME/snip-appimage}"
 CACHE="$WORK/cache"
 ROOTFS="$WORK/rootfs-ubuntu-22.04"
 OUT="$ROOT/dist/linux"
-APPIMAGE="Snip-x86_64.AppImage"
-ID=io.github.tcottrill.Snip
+APPIMAGE="FreeSnip-x86_64.AppImage"
+ID=io.github.tcottrill.FreeSnip
 [ -f "$ROOT/vendor/wxWidgets/CMakeLists.txt" ] || { echo "wxWidgets is missing: run git submodule update --init --recursive" >&2; exit 1; }
 mkdir -p "$CACHE" "$WORK/build" "$OUT"
 
@@ -100,7 +100,7 @@ inroot '
   rm -rf /build/AppDir /build/tools
   DESTDIR=/build/AppDir cmake --install /build/app
   mkdir -p /build/tools
-  LICENSES=/build/AppDir/usr/share/licenses/snip; mkdir -p "$LICENSES"
+  LICENSES=/build/AppDir/usr/share/licenses/freesnip; mkdir -p "$LICENSES"
   install -m644 /src/vendor/wxWidgets/docs/licence.txt "$LICENSES/wxWidgets.txt"
   install -Dm644 /src/packaging/flatpak/'"$ID"'.metainfo.xml /build/AppDir/usr/share/metainfo/'"$ID"'.appdata.xml
 
@@ -118,7 +118,7 @@ inroot '
   done
   rm -f /build/'"$APPIMAGE"'
   cd /build/tools && ./linuxdeploy-x86_64.AppImage --appdir /build/AppDir "${EXCLUDES[@]}" \
-    -e /build/AppDir/usr/bin/snip \
+    -e /build/AppDir/usr/bin/freesnip \
     -d /src/packaging/flatpak/'"$ID"'.desktop \
     -i /src/packaging/icons/hicolor/256x256/apps/'"$ID"'.png
   # The AppImage file'"'"'s own icon (.DirIcon, used by file managers): linuxdeploy links the

@@ -48,7 +48,7 @@ class AboutDialog : public wxGenericAboutDialog {
    wxConfigBase::Get()->Write("theme", theme);
    wxConfigBase::Get()->Flush();
 #ifdef __WXMSW__
-   wxMessageBox("The new theme applies the next time Snip starts.", "Theme", wxOK | wxICON_INFORMATION, this);
+   wxMessageBox("The new theme applies the next time FreeSnip starts.", "Theme", wxOK | wxICON_INFORMATION, this);
 #else
    wxTheApp->SetAppearance(appearance(theme));
 #endif
@@ -148,7 +148,7 @@ wxApp::Appearance savedAppearance() { return appearance(savedTheme()); }
 wxWindow* makeKofiButton(wxWindow* parent)
 {
  auto kofi = new KofiButton(parent);
- kofi->SetToolTip("Support Snip on Ko-fi (opens ko-fi.com/timcottrill in your browser)");
+ kofi->SetToolTip("Support FreeSnip on Ko-fi (opens ko-fi.com/timcottrill in your browser)");
  kofi->Bind(wxEVT_BUTTON, [](wxCommandEvent&) { wxLaunchDefaultBrowser(kofiPage); });
  return kofi;
 }
@@ -156,9 +156,10 @@ wxWindow* makeKofiButton(wxWindow* parent)
 void showAbout(wxWindow* parent)
 {
  wxAboutDialogInfo info;
- info.SetName("Snip");
+ info.SetName("FreeSnip");
  info.SetVersion(SNIP_VERSION);
- info.SetDescription("A small screen snipping tool: drag a rectangle on the frozen screen,\n"
+ info.SetDescription("Grab it. Clip it. Done.\n\n"
+                     "A small screen snipping tool: drag a rectangle on the frozen screen,\n"
                      "then paste it anywhere or save it as a PNG.");
  info.SetCopyright(wxString::FromUTF8("Copyright \xC2\xA9 2026 Tim Cottrill"));
  wxIcon icon;

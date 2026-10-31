@@ -1,9 +1,9 @@
 #include "snip.h"
+#include "app_icon.h"
 #include <wx/mstream.h>
 #ifdef __WXMSW__
 #include <wx/msw/wrapwin.h>
 #endif
-#include <algorithm>
 
 namespace snip {
 
@@ -18,42 +18,19 @@ wxMemoryBuffer pngBytes(const wxImage& image)
  return bytes;
 }
 
-// Blue rounded square with white crop corners. tools/make-icons.py draws the same design
-// for the packaged icons (packaging/icons).
+// The 256 px icon from packaging/icons (tools/make-icons.py), compiled in, scaled to s.
 wxImage appIconImage(int s)
 {
- wxImage image(s, s);
- image.InitAlpha();
- const float r = s / 5.0f;
- for (int y = 0; y < s; ++y) {
-  for (int x = 0; x < s; ++x) {
-   const float fx = x + 0.5f, fy = y + 0.5f;
-   const float dx = std::max({ r - fx, fx - (s - r), 0.0f });
-   const float dy = std::max({ r - fy, fy - (s - r), 0.0f });
-   image.SetRGB(x, y, 0x25, 0x63, 0xEB);
-   image.SetAlpha(x, y, dx * dx + dy * dy <= r * r ? 255 : 0);
-  }
- }
- auto fill = [&](int x0, int y0, int w, int h) {
-  for (int y = std::max(y0, 0); y < std::min(y0 + h, s); ++y)
-   for (int x = std::max(x0, 0); x < std::min(x0 + w, s); ++x) image.SetRGB(x, y, 255, 255, 255);
- };
- // Large sizes use the proportions of packaging/flatpak/io.github.tcottrill.Snip.svg;
- // small ones need longer, thicker marks to stay readable.
- const bool large = s >= 48;
- const int in = s * 22 / 100, len = std::max(2, s * (large ? 19 : 28) / 100), t = std::max(1, large ? s * 8 / 100 : s / 10);
- const int lo = in, hi = s - in;
- fill(lo, lo, len, t);           fill(lo, lo, t, len);
- fill(hi - len, lo, len, t);     fill(hi - t, lo, t, len);
- fill(lo, hi - t, len, t);       fill(lo, hi - len, t, len);
- fill(hi - len, hi - t, len, t); fill(hi - t, hi - len, t, len);
+ wxMemoryInputStream in(appIconPng, sizeof appIconPng);
+ wxImage image(in, wxBITMAP_TYPE_PNG);
+ if (image.IsOk() && image.GetWidth() != s) image.Rescale(s, s, wxIMAGE_QUALITY_HIGH);
  return image;
 }
 
 wxIconBundle appIcons()
 {
 #ifdef __WXMSW__
- // Every size of the exe's "appicon" group (packaging/icons/snip.ico): wx gives the title
+ // Every size of the exe's "appicon" group (packaging/icons/freesnip.ico): wx gives the title
  // bar, taskbar and tray the size for the window's DPI.
  wxIconBundle resource(wxString("appicon"), static_cast<WXHINSTANCE>(::GetModuleHandleW(nullptr)));
  if (!resource.IsEmpty()) return resource;

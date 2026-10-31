@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
- <id>io.github.tcottrill.Snip</id>
- <name>Snip</name>
- <summary>Capture, crop, copy and save screenshots</summary>
+ <id>io.github.tcottrill.FreeSnip</id>
+ <name>FreeSnip</name>
+ <summary>Grab it. Clip it. Done.</summary>
  <metadata_license>CC0-1.0</metadata_license>
  <project_license>LicenseRef-proprietary</project_license>
  <description><p>A small screen capture tool with rectangular cropping, clipboard copying and PNG saving.</p></description>
- <launchable type="desktop-id">io.github.tcottrill.Snip.desktop</launchable>
+ <launchable type="desktop-id">io.github.tcottrill.FreeSnip.desktop</launchable>
  <content_rating type="oars-1.1"/>
  <releases><release version="1.2.0" date="2026-10-30"/><release version="1.1.0" date="2026-10-21"/></releases>
 </component>

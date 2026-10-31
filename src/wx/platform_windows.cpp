@@ -17,7 +17,8 @@ constexpr UINT WM_APP_SNIP = WM_APP + 2;
 constexpr UINT WM_APP_SHOW = WM_APP + 3;
 const wchar_t kHostClass[] = L"SnipToolHost";
 const wchar_t kRunKey[] = L"Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-const wchar_t kRunValue[] = L"Snip";
+const wchar_t kRunValue[] = L"FreeSnip";
+const wchar_t kOldRunValue[] = L"Snip";
 
 HANDLE g_mutex = nullptr;
 HWND g_host = nullptr;
@@ -148,8 +149,18 @@ void startShortcuts(std::function<void()> snip, std::function<void()> show)
  wc.hInstance = GetModuleHandleW(nullptr);
  wc.lpszClassName = kHostClass;
  RegisterClassExW(&wc);
- g_host = CreateWindowExW(0, kHostClass, L"Snip", 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, wc.hInstance, nullptr);
+ g_host = CreateWindowExW(0, kHostClass, L"FreeSnip", 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, wc.hInstance, nullptr);
  if (!g_host) return;
+
+ // Before the rename to FreeSnip the sign-in entry was "Snip" (and pointed at snip.exe):
+ // move it to this exe.
+ HKEY run;
+ if (RegOpenKeyExW(HKEY_CURRENT_USER, kRunKey, 0, KEY_QUERY_VALUE | KEY_SET_VALUE, &run) == ERROR_SUCCESS) {
+  const bool old = RegQueryValueExW(run, kOldRunValue, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS;
+  if (old) RegDeleteValueW(run, kOldRunValue);
+  RegCloseKey(run);
+  if (old) setStartup(true);
+ }
 
  struct Hk { UINT mod, vk; const wchar_t* name; };
  const Hk hks[] = {

@@ -1,6 +1,6 @@
 # Linux build
 
-Snip uses the same wxWidgets code on Linux as on Windows (wxGTK 3, wx 3.3.4
+FreeSnip uses the same wxWidgets code on Linux as on Windows (wxGTK 3, wx 3.3.4
 statically linked). The Flatpak runs on the freedesktop 24.08 runtime, the same
 as Skein Downloader. Linux-specific code is in `src/wx/platform_linux.cpp`.
 
@@ -8,33 +8,35 @@ as Skein Downloader. Linux-specific code is in `src/wx/platform_linux.cpp`.
 
 Two packages (see "Releases" in the README for the release file names):
 
-- **AppImage** (`Snip-x86_64.AppImage`): no installation. Make it executable and run it:
-  `chmod +x Snip-*.AppImage && ./Snip-*.AppImage`. Runs on Ubuntu 22.04 and newer and
+- **AppImage** (`FreeSnip-x86_64.AppImage`): no installation. Make it executable and run it:
+  `chmod +x FreeSnip-*.AppImage && ./FreeSnip-*.AppImage`. Runs on Ubuntu 22.04 and newer and
   SteamOS; it uses the desktop's own GTK, so it follows the desktop theme and runs
   natively on Wayland. Uses `libfuse2` to mount itself; without it run it with
   `--appimage-extract-and-run`.
-- **Flatpak** (`Snip-x86_64.flatpak`), below.
+- **Flatpak** (`FreeSnip-x86_64.flatpak`), below.
 
-Copy `dist/linux/Snip-x86_64.flatpak` to your Linux machine. In SteamOS use
+Copy `dist/linux/FreeSnip-x86_64.flatpak` to your Linux machine. In SteamOS use
 Desktop Mode. Open the file in the software installer, or run:
 
 ```sh
-flatpak install --user ./Snip-x86_64.flatpak
-flatpak run io.github.tcottrill.Snip//preview
+flatpak install --user ./FreeSnip-x86_64.flatpak
+flatpak run io.github.tcottrill.FreeSnip//preview
 ```
 
 The first installation may download the freedesktop 24.08 runtime from Flathub
 (Downloader already uses it). This is a local test build, not a Flathub release.
-Installing a newer bundle the same way replaces it.
+Installing a newer bundle the same way replaces it. FreeSnip used to be called Snip,
+with the app ID `io.github.tcottrill.Snip`; remove that one with
+`flatpak uninstall --user io.github.tcottrill.Snip`.
 
 ## Capture and paste
 
-- Launch Snip from the menu (it starts a snip), or choose New (Ctrl+N) in its window.
-- On Wayland, Snip asks the desktop for a screenshot through the XDG screenshot
+- Launch FreeSnip from the menu (it starts a snip), or choose New (Ctrl+N) in its window.
+- On Wayland, FreeSnip asks the desktop for a screenshot through the XDG screenshot
   portal (your desktop may ask permission), then covers each screen with its
   frozen contents. Drag a rectangle and release to copy it. Enter takes the
   screen under the pointer; Escape or right-click cancels.
-- On X11 Snip reads the screen itself and shows the same frozen screen.
+- On X11 FreeSnip reads the screen itself and shows the same frozen screen.
 - A finished snip is on the clipboard (image/png) at once; paste it with Ctrl+V.
   Copy (Ctrl+C) copies again; Save As (Ctrl+S) writes a PNG through the desktop's
   file chooser.
@@ -43,15 +45,15 @@ Installing a newer bundle the same way replaces it.
   opens the desktop's own picker. Their results are copied without a selection step.
 - Window picking with W on the frozen screen is Windows-only (Wayland gives
   applications no window list).
-- Closing the window hides it when a tray is available; otherwise Snip exits.
-  Keep Snip running until you have pasted: Linux clipboards empty when the
+- Closing the window hides it when a tray is available; otherwise FreeSnip exits.
+  Keep FreeSnip running until you have pasted: Linux clipboards empty when the
   owning program quits. Quit (Ctrl+Q) always exits.
 
 **About** has a Theme choice (Same as system, Light, Dark) that applies at once.
 
 The tray icon is a StatusNotifierItem (KDE Plasma and SteamOS show it; GNOME
 needs the AppIndicator extension). Click it for a new snip; its menu has New,
-Capture, Show Snip, Cancel capture and Exit. Launching Snip again tells the
+Capture, Show FreeSnip, Cancel capture and Exit. Launching FreeSnip again tells the
 running copy to snip; `--tray` starts it quietly.
 
 **Shortcut...** asks the desktop's GlobalShortcuts portal for a capture key
@@ -59,15 +61,15 @@ running copy to snip; `--tray` starts it quietly.
 a shortcut in your desktop's keyboard settings:
 
 ```sh
-flatpak run io.github.tcottrill.Snip//preview --snip
+flatpak run io.github.tcottrill.FreeSnip//preview --snip
 ```
 
-Snip never takes over Print Screen or changes desktop shortcuts.
+FreeSnip never takes over Print Screen or changes desktop shortcuts.
 
 ## Display and portal behavior
 
 Rectangle mode asks the portal for a non-interactive full-desktop screenshot.
-Snip checks that the image matches the monitor layout before covering the
+FreeSnip checks that the image matches the monitor layout before covering the
 screens, and that each frozen screen was placed exactly over its monitor before
 it accepts a selection; otherwise it cancels with a message rather than copying
 the wrong pixels. Snips are cut from the screenshot's own pixels, so scaled
@@ -86,10 +88,10 @@ wsl -d Ubuntu -e bash -c 'cd /mnt/c/Source2026/clip && flatpak run --filesystem=
 wsl -d Ubuntu -e bash /mnt/c/Source2026/clip/tools/package-flatpak.sh
 ```
 
-`tools/build-linux.sh` writes `dist/linux/snip` and runs the smoke test when a
+`tools/build-linux.sh` writes `dist/linux/freesnip` and runs the smoke test when a
 display is available. `SNIP_BUILD_DIR` keeps the build tree on the Linux side,
 which is much faster than `/mnt/c`. `tools/package-flatpak.sh` writes
-`dist/linux/Snip-x86_64.flatpak` and its SHA-256 file; its work folder is
+`dist/linux/FreeSnip-x86_64.flatpak` and its SHA-256 file; its work folder is
 `~/snip-flatpak` (`SNIP_FLATPAK_WORK`). The SDK and runtime come from Flathub:
 
 ```sh
@@ -105,7 +107,7 @@ wsl -d Ubuntu -e bash /mnt/c/Source2026/clip/tools/build-linux-appimage.sh
 It builds inside an Ubuntu 22.04 userland started with bubblewrap (no root; needs
 bash, curl and bwrap), links wx statically, leaves GTK to the system, packs with
 linuxdeploy and smoke-tests the result under xvfb. Output:
-`dist/linux/Snip-x86_64.AppImage` and its SHA-256 file. Downloads are pinned by
+`dist/linux/FreeSnip-x86_64.AppImage` and its SHA-256 file. Downloads are pinned by
 checksum and cached in `~/snip-appimage` (`SNIP_APPIMAGE_WORK`).
 
 The Flatpak needs only Wayland/X11, IPC and the GPU, plus talking to
@@ -126,8 +128,8 @@ and Exit. Needs `dbus-run-session` and a Wayland display (WSLg works).
 Smoke runs (synthetic image, no capture, no clipboard; exit by themselves):
 
 ```sh
-flatpak run io.github.tcottrill.Snip//preview --smoke-test
-dist/linux/snip --smoke-test --overlay --screenshot overlay.png
+flatpak run io.github.tcottrill.FreeSnip//preview --smoke-test
+dist/linux/freesnip --smoke-test --overlay --screenshot overlay.png
 ```
 
 `--overlay` shows a frozen screen with a sample selection instead of the window,

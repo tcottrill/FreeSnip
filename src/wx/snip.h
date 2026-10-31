@@ -1,4 +1,4 @@
-// Snip: the same window, frozen-screen selection and tray on Windows and Linux,
+// FreeSnip: the same window, frozen-screen selection and tray on Windows and Linux,
 // in wxWidgets. Capture, clipboard, global shortcuts, the tray icon and the
 // single instance are platform code (platform_windows.cpp, platform_linux.cpp).
 #pragma once
@@ -51,7 +51,7 @@ wxApp::Appearance savedAppearance();
 wxWindow* makeKofiButton(wxWindow* parent);
 
 namespace platform {
-// True when Snip is already running; the command ("snip", "show" or "tray") went to it.
+// True when FreeSnip is already running; the command ("snip", "show" or "tray") went to it.
 bool otherInstance(const wxString& command);
 void startShortcuts(std::function<void()> snip, std::function<void()> show);
 void stopShortcuts();

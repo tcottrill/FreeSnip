@@ -1,7 +1,9 @@
 /build/
 /dist/*.exe
 /dist/debug/
+/dist/linux/freesnip
 /dist/linux/snip
 /dist/release/
 /snip.exe
+/freesnip.exe
 *.log

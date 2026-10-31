@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds dist/linux/snip (wxGTK 3, static wx). Run inside org.freedesktop.Sdk//24.08
+# Builds dist/linux/freesnip (wxGTK 3, static wx). Run inside org.freedesktop.Sdk//24.08
 # (see docs/linux-build.md) or on a system with GTK 3 development files, CMake and Ninja.
 # The smoke test runs when a display is available (WAYLAND_DISPLAY or DISPLAY).
 set -eu

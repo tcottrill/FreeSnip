@@ -1,53 +1,48 @@
 #!/usr/bin/env python3
-"""Builds packaging/icons: Snip's icon, a blue rounded square with white crop corners.
+"""Builds packaging/icons: FreeSnip's icon, from the artwork in packaging/icons/freesnip.png.
 
 usage: make-icons.py [OUT_DIR]     default: packaging/icons
 
-The geometry is the same as appIconImage() in src/wx/image.cpp, which draws the window
-and tray icons at run time: corner radius s/5, marks inset 22%; from 48 px up arms of
-19% and 8% thick, smaller sizes longer (28%) and thicker (s/10) marks so they stay
-readable. Each size is drawn at 4x with its marks on whole pixels and scaled down, so
-only the rounded corners are smoothed.
+The artwork (blue scissors cutting into crop corners, on a transparent background) is
+trimmed to its visible pixels, centred on a square with a small margin and scaled down
+to each size with Lanczos, plus light sharpening below 48 px so the small sizes keep
+their edges. The program draws its own window, tray and About icons from the 256 px
+PNG, compiled in by CMakeLists.txt (appIconImage in src/wx/image.cpp).
 
-- hicolor/<n>x<n>/apps/io.github.tcottrill.Snip.png for the Linux icon theme sizes.
-- snip.ico for Windows (the exe, installer and shortcuts): classic 32-bit bitmaps up
+- hicolor/<n>x<n>/apps/io.github.tcottrill.FreeSnip.png for the Linux icon theme sizes.
+- freesnip.ico for Windows (the exe, installer and shortcuts): classic 32-bit bitmaps up
   to 128 px and PNG only for 256 px, the one size every Windows icon loader accepts
   compressed (as tools/make-icons.py in Skein Downloader writes it).
-Needs Pillow. Run it again whenever the design changes, then rebuild.
+Needs Pillow. Run it again whenever the artwork changes, then rebuild.
 """
 import io
 import pathlib
 import struct
 import sys
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageFilter
 
-APP_ID = 'io.github.tcottrill.Snip'
+APP_ID = 'io.github.tcottrill.FreeSnip'
+SOURCE = pathlib.Path(__file__).resolve().parent.parent / 'packaging' / 'icons' / 'freesnip.png'
 LINUX_SIZES = (16, 22, 24, 32, 48, 64, 96, 128, 192, 256, 512)
 WINDOWS_SIZES = (16, 20, 24, 32, 40, 48, 64, 96, 128, 256)
-BLUE = (0x25, 0x63, 0xEB, 255)
-WHITE = (255, 255, 255, 255)
-SCALE = 4
+MARGIN = 0.03   # of the side, on each edge
 
 
-def icon(s):
-    k = SCALE
-    image = Image.new('RGBA', (s * k, s * k), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-    draw.rounded_rectangle((0, 0, s * k - 1, s * k - 1), radius=s * k / 5, fill=BLUE)
-    large = s >= 48
-    inset = s * 22 // 100
-    length = max(2, s * (19 if large else 28) // 100)
-    thick = max(1, s * 8 // 100 if large else s // 10)
-    lo, hi = inset, s - inset
+def master():
+    art = Image.open(SOURCE).convert('RGBA')
+    art = art.crop(art.getchannel('A').getbbox())
+    side = round(max(art.size) / (1 - 2 * MARGIN))
+    square = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+    square.alpha_composite(art, ((side - art.width) // 2, (side - art.height) // 2))
+    return square
 
-    def fill(x, y, w, h):
-        draw.rectangle((x * k, y * k, (x + w) * k - 1, (y + h) * k - 1), fill=WHITE)
-    fill(lo, lo, length, thick);                  fill(lo, lo, thick, length)
-    fill(hi - length, lo, length, thick);         fill(hi - thick, lo, thick, length)
-    fill(lo, hi - thick, length, thick);          fill(lo, hi - length, thick, length)
-    fill(hi - length, hi - thick, length, thick); fill(hi - thick, hi - length, thick, length)
-    return image.resize((s, s), Image.Resampling.LANCZOS)
+
+def icon(art, s):
+    image = art.resize((s, s), Image.Resampling.LANCZOS)
+    if s < 48:
+        image = image.filter(ImageFilter.UnsharpMask(radius=0.6, percent=60, threshold=0))
+    return image
 
 
 def dib(image):
@@ -88,11 +83,12 @@ def write_ico(images, path):
 
 def main(out='packaging/icons'):
     out = pathlib.Path(out)
+    art = master()
     for size in LINUX_SIZES:
         target = out / 'hicolor' / f'{size}x{size}' / 'apps' / f'{APP_ID}.png'
         target.parent.mkdir(parents=True, exist_ok=True)
-        icon(size).save(target)
-    write_ico([(size, icon(size)) for size in WINDOWS_SIZES], out / 'snip.ico')
+        icon(art, size).save(target, optimize=True)
+    write_ico([(size, icon(art, size)) for size in WINDOWS_SIZES], out / 'freesnip.ico')
     print('Linux sizes:', ', '.join(map(str, LINUX_SIZES)))
     print('Windows .ico sizes:', ', '.join(map(str, WINDOWS_SIZES)))
 

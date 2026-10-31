@@ -1,9 +1,9 @@
 # Gathers the files for a GitHub release into dist/release/, named with the version from
 # CMakeLists.txt, with SHA256SUMS.txt:
-#   Snip-<version>-windows-x64-setup.exe     installer (tools/build-installer.ps1)
-#   Snip-<version>-windows-x64-portable.zip  snip.exe to run from any folder
-#   Snip-<version>-linux-x86_64.AppImage     tools/build-linux-appimage.sh
-#   Snip-<version>-linux-x86_64.flatpak      tools/package-flatpak.sh
+#   FreeSnip-<version>-windows-x64-setup.exe     installer (tools/build-installer.ps1)
+#   FreeSnip-<version>-windows-x64-portable.zip  freesnip.exe to run from any folder
+#   FreeSnip-<version>-linux-x86_64.AppImage     tools/build-linux-appimage.sh
+#   FreeSnip-<version>-linux-x86_64.flatpak      tools/package-flatpak.sh
 # Run after those builds, or use tools/build-all.ps1 for all of it. Missing packages are
 # reported and skipped. Upload everything in dist/release/ to the release for the tag.
 $ErrorActionPreference = 'Stop'
@@ -15,22 +15,22 @@ $out = Join-Path $dist 'release'
 if (Test-Path -LiteralPath $out) { Remove-Item -LiteralPath $out -Recurse -Force }
 New-Item -ItemType Directory $out | Out-Null
 
-$exe = Join-Path $dist 'snip.exe'
+$exe = Join-Path $dist 'freesnip.exe'
 if (Test-Path -LiteralPath $exe) {
-    $stage = Join-Path $out "Snip-$version-windows-x64-portable"
+    $stage = Join-Path $out "FreeSnip-$version-windows-x64-portable"
     New-Item -ItemType Directory $stage | Out-Null
     Copy-Item -LiteralPath $exe, (Join-Path $repo 'README.md') -Destination $stage
     Copy-Item -LiteralPath (Join-Path $repo 'vendor/wxWidgets/docs/licence.txt') -Destination (Join-Path $stage 'wxWidgets-licence.txt')
     Compress-Archive -Path (Join-Path $stage '*') -DestinationPath "$stage.zip"
     Remove-Item -LiteralPath $stage -Recurse -Force
 } else { Write-Warning "No Windows build ($exe)" }
-$setup = Join-Path $repo "build/installer/Snip-$version-windows-x64-setup.exe"
+$setup = Join-Path $repo "build/installer/FreeSnip-$version-windows-x64-setup.exe"
 if (Test-Path -LiteralPath $setup) { Copy-Item -LiteralPath $setup -Destination $out }
 else { Write-Warning "No Windows installer ($setup): run tools/build-installer.ps1" }
 
 $linux = Join-Path $dist 'linux'
-foreach ($package in @(@('Snip-x86_64.AppImage', "Snip-$version-linux-x86_64.AppImage"),
-                       @('Snip-x86_64.flatpak', "Snip-$version-linux-x86_64.flatpak"))) {
+foreach ($package in @(@('FreeSnip-x86_64.AppImage', "FreeSnip-$version-linux-x86_64.AppImage"),
+                       @('FreeSnip-x86_64.flatpak', "FreeSnip-$version-linux-x86_64.flatpak"))) {
     $file = Join-Path $linux $package[0]
     if (Test-Path -LiteralPath $file) { Copy-Item -LiteralPath $file -Destination (Join-Path $out $package[1]) }
     else { Write-Warning "No $($package[0]) in $linux" }

@@ -12,7 +12,7 @@ namespace snip {
 class FrozenDesktop::Surface : public wxFrame {
 public:
  Surface(FrozenDesktop* owner, const Output& output)
-  : wxFrame(nullptr, wxID_ANY, "Snip", output.geometry.GetPosition(), output.geometry.GetSize(),
+  : wxFrame(nullptr, wxID_ANY, "FreeSnip", output.geometry.GetPosition(), output.geometry.GetSize(),
             wxBORDER_NONE | wxSTAY_ON_TOP | wxFRAME_NO_TASKBAR),
     owner_(owner), out_(output),
     scale_(output.geometry.width > 0 ? double(output.pixels.width) / output.geometry.width : 1.0)

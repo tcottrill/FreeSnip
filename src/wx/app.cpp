@@ -1,5 +1,5 @@
-// Snip start-up, tray menu and command line (/x, -x and --x all work):
-//   (none)  open the Snip window (or the running instance's)
+// FreeSnip start-up, tray menu and command line (/x, -x and --x all work):
+//   (none)  open the FreeSnip window (or the running instance's)
 //   --snip  start a capture immediately (also in the running instance)
 //   --tray  start quietly in the tray ("Start with Windows" uses it)
 //   --smoke-test  show a synthetic snip without capturing or touching the clipboard, then exit
@@ -40,7 +40,7 @@ std::vector<snip::TrayItem> trayMenu()
  capture.submenu.push_back({ ID_TRAY_OPTIONS, "Desktop options..." });
 #endif
  items.push_back(capture);
- items.push_back({ ID_TRAY_SHOW, "Show Snip" });
+ items.push_back({ ID_TRAY_SHOW, "Show FreeSnip" });
 #ifndef __WXMSW__
  items.push_back({ ID_TRAY_CANCEL, "Cancel capture" });
 #endif
@@ -149,7 +149,7 @@ public:
   }
 #ifdef __WXGTK__
   // The Wayland app_id / X11 class must match the .desktop file for the taskbar icon.
-  g_set_prgname("io.github.tcottrill.Snip");
+  g_set_prgname("io.github.tcottrill.FreeSnip");
 #endif
   if (!smoke && snip::platform::otherInstance(snipNow ? "snip" : tray ? "tray" : "show")) {
    // Handed over to the running copy: exit with success, without a window.
@@ -158,8 +158,10 @@ public:
    return true;
   }
 
-  SetAppName("Snip");
+  SetAppName("FreeSnip");
   SetVendorName("tcottrill");
+  // Settings stay where Snip, the name before FreeSnip, kept them.
+  wxConfigBase::Set(new wxConfig("Snip", "tcottrill"));
   SetAppearance(snip::savedAppearance());   // before the first window (Windows applies it only then)
   wxImage::AddHandler(new wxPNGHandler);
   g_main = new snip::MainWindow;
@@ -201,7 +203,7 @@ public:
   const wxString keys = snip::platform::shortcutNames();
   const bool trayShown = snip::platform::startTray(
    { [] { if (g_main) g_main->startCapture(snip::CaptureMode::Rectangle, 150); }, trayMenu, trayChosen },
-   keys.empty() ? wxString("Snip - click to snip") : "Snip - click or " + keys);
+   keys.empty() ? wxString("FreeSnip - click to snip") : "FreeSnip - click or " + keys);
   g_main->setKeepRunning(trayShown);   // without a tray, closing the window exits
 #ifdef __WXGTK__
   // Logout and "Exit game" on SteamOS send SIGTERM: close normally.

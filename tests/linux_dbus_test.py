@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Linux integration test for Snip's D-Bus side, on a private session bus.
+"""Linux integration test for FreeSnip's D-Bus side, on a private session bus.
 
-Fakes the XDG Screenshot portal and a StatusNotifierWatcher, then checks that Snip
+Fakes the XDG Screenshot portal and a StatusNotifierWatcher, then checks that FreeSnip
 registers its tray item and menu, captures through the portal from the tray menu,
 hands --snip from a second launch to the running instance, and exits from the menu.
 
-  dbus-run-session -- python3 tests/linux_dbus_test.py dist/linux/snip
+  dbus-run-session -- python3 tests/linux_dbus_test.py dist/linux/freesnip
 
 Needs a display (Wayland or X11) and PyGObject. See docs/linux-build.md.
 """
@@ -114,8 +114,8 @@ check(pump(lambda: items, 15), 'tray item registered with the watcher')
 sender, item_path = items[0] if items else ('', '')
 check(item_path == '/StatusNotifierItem', 'registered by object path')
 owner = bus.call_sync('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner',
-                      GLib.Variant('(s)', ('io.github.tcottrill.Snip',)), None, Gio.DBusCallFlags.NONE, -1, None)
-check(owner.unpack()[0] == sender, 'Snip owns io.github.tcottrill.Snip')
+                      GLib.Variant('(s)', ('io.github.tcottrill.FreeSnip',)), None, Gio.DBusCallFlags.NONE, -1, None)
+check(owner.unpack()[0] == sender, 'FreeSnip owns io.github.tcottrill.FreeSnip')
 
 
 def call(path, iface, method, args, reply_type=None):
@@ -125,7 +125,7 @@ def call(path, iface, method, args, reply_type=None):
 
 props = call('/StatusNotifierItem', 'org.freedesktop.DBus.Properties', 'GetAll',
              GLib.Variant('(s)', ('org.kde.StatusNotifierItem',)))[0]
-check(props.get('Menu') == '/MenuBar' and props.get('Id') == 'io.github.tcottrill.Snip', 'item properties')
+check(props.get('Menu') == '/MenuBar' and props.get('Id') == 'io.github.tcottrill.FreeSnip', 'item properties')
 check(len(props.get('IconPixmap', [])) >= 4, 'item icon pixmaps')
 
 _, layout = call('/MenuBar', 'com.canonical.dbusmenu', 'GetLayout', GLib.Variant('(iias)', (0, -1, [])))
@@ -142,7 +142,7 @@ def walk(node, depth=0):
 
 walk(layout)
 check({'New snip', 'Capture', 'Rectangle', 'Full desktop', 'Active window', 'Desktop options...',
-       'Show Snip', 'Cancel capture', 'Exit'} <= set(ids), 'menu items: %s' % sorted(ids))
+       'Show FreeSnip', 'Cancel capture', 'Exit'} <= set(ids), 'menu items: %s' % sorted(ids))
 
 
 def click(label):

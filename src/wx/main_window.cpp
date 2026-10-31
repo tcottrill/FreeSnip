@@ -16,7 +16,7 @@ enum { ID_NEW = wxID_HIGHEST + 1, ID_RECTANGLE, ID_WINDOW, ID_DESKTOP, ID_ACTIVE
        ID_CANCEL, ID_SHORTCUT, ID_CLOSE };
 }
 
-MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Snip")
+MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "FreeSnip")
 {
  SetIcons(appIcons());
  auto panel = new wxPanel(this);
@@ -204,7 +204,7 @@ void MainWindow::showImage(wxImage image, wxPoint from, bool copy)
  if (cancel_) cancel_->Disable();
  copy_->Enable();
  save_->Enable(!png_.IsEmpty());
- SetTitle(wxString::Format("Snip - %d x %d", image_.GetWidth(), image_.GetHeight()));
+ SetTitle(wxString::Format("FreeSnip - %d x %d", image_.GetWidth(), image_.GetHeight()));
  // Open on the monitor the snip came from.
  if (!IsShown() && from != wxDefaultPosition) {
   const int display = wxDisplay::GetFromPoint(from);

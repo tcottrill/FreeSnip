@@ -2,7 +2,7 @@
 // GlobalShortcuts portal, a StatusNotifierItem tray icon with a D-Bus menu, and
 // the single instance as an owned D-Bus name. All D-Bus work uses GLib's GDBus,
 // which GTK already depends on, so nothing else is needed at run time; inside the
-// Flatpak the portals and the tray watcher are the only services Snip talks to.
+// Flatpak the portals and the tray watcher are the only services FreeSnip talks to.
 #include "snip.h"
 #include <wx/clipbrd.h>
 #include <gtk/gtk.h>
@@ -17,8 +17,8 @@
 namespace snip::platform {
 namespace {
 
-const char* const kAppId = "io.github.tcottrill.Snip";
-const char* const kAppPath = "/io/github/tcottrill/Snip";
+const char* const kAppId = "io.github.tcottrill.FreeSnip";
+const char* const kAppPath = "/io/github/tcottrill/FreeSnip";
 const char* const kPortal = "org.freedesktop.portal.Desktop";
 const char* const kPortalPath = "/org/freedesktop/portal/desktop";
 
@@ -32,7 +32,7 @@ wxString errorText(GError* error) { return error ? wxString::FromUTF8(error->mes
 
 std::function<void()> g_snip, g_show;
 
-// ---- Single instance: the first copy owns io.github.tcottrill.Snip ---------------
+// ---- Single instance: the first copy owns io.github.tcottrill.FreeSnip -----------
 
 void instanceCall(GDBusConnection*, const gchar*, const gchar*, const gchar*, const gchar* method,
                   GVariant*, GDBusMethodInvocation* invocation, gpointer)
@@ -48,7 +48,7 @@ void instanceCall(GDBusConnection*, const gchar*, const gchar*, const gchar*, co
 void registerInstance()
 {
  static GDBusNodeInfo* info = g_dbus_node_info_new_for_xml(
-  "<node><interface name='io.github.tcottrill.Snip'><method name='Snip'/><method name='Show'/></interface></node>", nullptr);
+  "<node><interface name='io.github.tcottrill.FreeSnip'><method name='Snip'/><method name='Show'/></interface></node>", nullptr);
  static const GDBusInterfaceVTable vtable{ instanceCall, nullptr, nullptr, {} };
  if (info) g_dbus_connection_register_object(bus(), kAppPath, info->interfaces[0], &vtable, nullptr, nullptr, nullptr);
 }
@@ -345,8 +345,8 @@ void closeSession()
 wxString shortcutFailure(guint32 code, const wxString& fallback)
 {
  if (code == 1) return "Shortcut setup cancelled";
- if (code == 3) return "Global shortcut setup is unavailable on this desktop. Assign the Snip launcher in desktop keyboard settings.";
- if (code == 4) return "Shortcut setup timed out. You can also assign the Snip launcher in desktop settings.";
+ if (code == 3) return "Global shortcut setup is unavailable on this desktop. Assign the FreeSnip launcher in desktop keyboard settings.";
+ if (code == 4) return "Shortcut setup timed out. You can also assign the FreeSnip launcher in desktop settings.";
  return fallback;
 }
 
@@ -457,7 +457,7 @@ GVariant* itemProperty(GDBusConnection*, const gchar*, const gchar*, const gchar
  const std::string p = name;
  if (p == "Category") return g_variant_new_string("ApplicationStatus");
  if (p == "Id") return g_variant_new_string(kAppId);
- if (p == "Title") return g_variant_new_string("Snip");
+ if (p == "Title") return g_variant_new_string("FreeSnip");
  if (p == "Status") return g_variant_new_string("Active");
  if (p == "WindowId") return g_variant_new_int32(0);
  if (p == "IconName") return g_variant_new_string(std::getenv("FLATPAK_ID") ? kAppId : "");   // exported by the Flatpak
@@ -465,7 +465,7 @@ GVariant* itemProperty(GDBusConnection*, const gchar*, const gchar*, const gchar
  if (p == "ToolTip") {
   GVariantBuilder none;
   g_variant_builder_init(&none, G_VARIANT_TYPE("a(iiay)"));
-  return g_variant_new("(sa(iiay)ss)", "", &none, "Snip", g_tooltip.utf8_str().data());
+  return g_variant_new("(sa(iiay)ss)", "", &none, "FreeSnip", g_tooltip.utf8_str().data());
  }
  if (p == "ItemIsMenu") return g_variant_new_boolean(FALSE);
  if (p == "Menu") return g_variant_new_object_path("/MenuBar");
@@ -623,7 +623,7 @@ bool otherInstance(const wxString& command)
   return false;
  }
  if (command != "tray") {
-  GVariant* done = g_dbus_connection_call_sync(bus(), kAppId, kAppPath, "io.github.tcottrill.Snip",
+  GVariant* done = g_dbus_connection_call_sync(bus(), kAppId, kAppPath, "io.github.tcottrill.FreeSnip",
    command == "snip" ? "Snip" : "Show", nullptr, nullptr, G_DBUS_CALL_FLAGS_NONE, 3000, nullptr, nullptr);
   if (done) g_variant_unref(done);
  }
