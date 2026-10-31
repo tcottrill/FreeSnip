@@ -14,7 +14,7 @@ Choose a Windows installer or portable ZIP, a Linux AppImage, or a Flatpak with
 SteamOS support. The Windows app runs as a single executable with no services,
 Store app, or extra runtime dependencies.
 
-**[Downloads](#downloads) · [Quick start](#quick-start) · [Keyboard shortcuts](#keyboard-shortcuts) · [Building from source](#building-from-source)**
+**[Downloads](#downloads) · [Screenshots](#screenshots) · [Quick start](#quick-start) · [Keyboard shortcuts](#keyboard-shortcuts) · [Building from source](#building-from-source)**
 
 ## Features
 
@@ -24,6 +24,29 @@ Store app, or extra runtime dependencies.
 - **Close at hand** — start a capture from the window, tray, or a keyboard shortcut.
 - **Native light and dark themes** — follow the system theme or choose your own under **About → Theme**.
 - **A small native app** — built with C++ and wxWidgets for Windows and Linux.
+
+## Screenshots
+
+### Screen capture, in light or dark
+
+Start a new snip, choose a capture mode, then copy or save the result.
+
+<table>
+  <tr><th>Light theme</th><th>Dark theme</th></tr>
+  <tr>
+    <td><a href="images/main_window_lite.png"><img src="images/main_window_lite.png" alt="FreeSnip main window in light mode, ready for a new screen capture" width="100%"></a></td>
+    <td><a href="images/main_window_dark.png"><img src="images/main_window_dark.png" alt="FreeSnip main window in dark mode, ready for a new screen capture" width="100%"></a></td>
+  </tr>
+</table>
+
+<details>
+<summary>Theme settings</summary>
+
+Choose **Same as system**, **Light**, or **Dark** under **About → Theme**.
+
+![FreeSnip About window with the theme selector open](images/theme_settings.png)
+
+</details>
 
 ## Downloads
 
@@ -47,10 +70,6 @@ FreeSnip is packaged in four formats. Choose the package for your platform;
 - **Flatpak:** open the bundle in your software installer. On SteamOS, use Desktop
   Mode. See the [Linux guide](docs/linux-build.md#install-on-ubuntu-or-steamos)
   for installation commands and runtime details.
-
-FreeSnip was previously called **Snip**. The Windows installer upgrades an existing
-Snip installation and moves its sign-in entry; settings carry over. Linux Flatpak
-users should follow the migration instructions in the Linux guide.
 
 ## Quick start
 
